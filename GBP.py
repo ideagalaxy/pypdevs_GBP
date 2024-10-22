@@ -82,19 +82,28 @@ class BUF(AtomicDEVS):
 
         if n == 0 or proc_state == "B":
             return INFINITY
-        elif n != 0 or proc_state == "F":
+        elif n != 0 and proc_state == "F":
             if self.max_length != INFINITY:
                 if n >= self.max_length:
                     self.full == True
                     return INFINITY
-            self.full = False
-            n -= 1
-            self.state = BUFState([n,"B"])
             return 0.0
         else:
             raise DEVSException(\
                 "unknown state <%s> in BUF time advance transition function"\
                 % state)
+        
+    def intTransition(self):
+        state = self.state.get()
+        n, proc_state = state
+
+        self.full = False
+        n -= 1
+        proc_state = "B"
+        self.state = BUFState([n,proc_state])
+
+        return self.state
+
         
     def extTransition(self, inputs):
         state = self.state.get()
@@ -227,7 +236,7 @@ class GBP(CoupledDEVS):
 
 sim = Simulator(GBP("GBP"))
 sim.setVerbose()
-sim.setTerminationTime(200)
+sim.setTerminationTime(200) #test : 200sec
 sim.setClassicDEVS()
 
 sim.simulate()
