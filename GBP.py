@@ -114,10 +114,11 @@ class BUF(AtomicDEVS):
 
         if inport:
             if inport == "out":
-                if self.full:
+                if self.full == True:
                     return self.state
                 else:
-                    n += 1
+                    if n < self.max_length:
+                        n += 1
                     self.state = BUFState([n,proc_state])
                     return self.state
             else:
@@ -205,7 +206,7 @@ class BP(CoupledDEVS):
     def __init__(self, name):
         CoupledDEVS.__init__(self, name)
 
-        self.buffer = self.addSubModel(BUF(name="BUF", max_length= 6))
+        self.buffer = self.addSubModel(BUF(name="BUF", max_length= 2))
         self.processor = self.addSubModel(PROC(name="PROC", process_time=12))
 
         self.inport = self.addInPort("BP_inport")
