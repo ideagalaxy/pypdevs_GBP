@@ -83,10 +83,6 @@ class BUF(AtomicDEVS):
         if n == 0 or proc_state == "B":
             return INFINITY
         elif n != 0 and proc_state == "F":
-            if self.max_length != INFINITY:
-                if n >= self.max_length:
-                    self.full == True
-                    return INFINITY
             return 0.0
         else:
             raise DEVSException(\
@@ -206,8 +202,8 @@ class BP(CoupledDEVS):
     def __init__(self, name):
         CoupledDEVS.__init__(self, name)
 
-        self.buffer = self.addSubModel(BUF(name="BUF", max_length= 2))
-        self.processor = self.addSubModel(PROC(name="PROC", process_time=12))
+        self.buffer = self.addSubModel(BUF(name="BUF", max_length=4))
+        self.processor = self.addSubModel(PROC(name="PROC", process_time=4))
 
         self.inport = self.addInPort("BP_inport")
         self.outport = self.addOutPort("BP_ouport")
@@ -226,7 +222,7 @@ class GBP(CoupledDEVS):
     def __init__(self, name):
         CoupledDEVS.__init__(self, name)
 
-        self.generator = self.addSubModel(GEN(name="GEN", gen_time=10))
+        self.generator = self.addSubModel(GEN(name="GEN", gen_time=2))
         self.bp_model = self.addSubModel(BP(name="BP"))
 
         self.connectPorts(self.generator.outport, self.bp_model.inport)
@@ -237,7 +233,7 @@ class GBP(CoupledDEVS):
 
 sim = Simulator(GBP("GBP"))
 sim.setVerbose()
-sim.setTerminationTime(200) #test : 200sec
+sim.setTerminationTime(80) #test : 200sec
 sim.setClassicDEVS()
 
 sim.simulate()
